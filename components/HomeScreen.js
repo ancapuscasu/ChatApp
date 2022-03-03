@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, ImageBackground, Pressable, TextInput, Button, TouchableOpacity } from "react-native";
 
+//importing UI components from react-native
+import { StyleSheet, View, Text, ImageBackground, Pressable, TextInput, TouchableOpacity, KeyboardAvoidingView } from "react-native";
+
+//importing assets
 import BackgroundImage from '../assets/BackgroundImage.png';
 import ProfileIcon from '../assets/ProfileIcon.svg'
 
@@ -8,11 +11,11 @@ import ProfileIcon from '../assets/ProfileIcon.svg'
 // The application’s Home Screen component that renders the landing page
 const HomeScreen = ({ navigation }) => {
 
-  //initial state values 
+  //initial state values (username and bubble background color)
   const [ name, setName ] = useState('');
-  const [ bgColor, setBgColor ] = useState("#fff");
+  const [ bgColor, setBgColor ] = useState("#999");
 
-  // function to update the state with the new background color for Chat Screen chosen by the user
+  // function to update the state with the new background color for Chat bubble chosen by the user
   const changeBgColor = newColor => {
     setBgColor(newColor);
   }
@@ -26,11 +29,9 @@ const HomeScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.screen}>
+    <KeyboardAvoidingView style={styles.screen} behavior="height">
       <ImageBackground source={BackgroundImage} resizeMode='cover' style={styles.backgroundImage}>
-        <View style={styles.titleBox}>
-            <Text style={styles.title}>ChatApp</Text>
-        </View>
+        <Text style={styles.title}>ChatApp</Text>
 
         <View style={styles.boxHomeScreen}>
           <View style={styles.boxNameInput}>
@@ -76,9 +77,14 @@ const HomeScreen = ({ navigation }) => {
           </View>
         </View>  
       </ImageBackground>
-    </View>
+      { Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null}
+    </KeyboardAvoidingView>
   );
 }
+
+
+
+//styles
 
 const styles = StyleSheet.create({
   // ****** screen ******
@@ -87,31 +93,28 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     flex: 1,
-    width: '100%',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'space-between'
   },
 
   // ****** app title ******
-  titleBox: {
-    height: '50%',
-    width: '88%',
-    alignItems: 'center',
-    paddingTop: 100
-  },
   title: {
+    textAlign: "center",
     fontSize: 45, 
     fontWeight: "600", 
     color: '#FFFFFF',
+    top: "15%",
   },
 
   // ****** Home Screen box ******
   boxHomeScreen: {
     backgroundColor: 'rgb(255, 255, 255)', 
-    height: '44%',
     width: '88%',
     justifyContent: 'space-around', 
     alignItems: 'center',
+    marginBottom: 20,
+    paddingTop: 15,
+    paddingBottom: 15,
     },
 
   // ****** Name Input ******
@@ -124,7 +127,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: "white"
+    backgroundColor: "white",
   },
   nameInput: {
     fontSize: 16,
@@ -136,20 +139,23 @@ const styles = StyleSheet.create({
 
   // ****** Color Selector ******
   boxColorSelector: {
-    flex: 0.4,
     width: "88%",
     backgroundColor:"white",
+    paddingTop: 10,
+    paddingBottom: 10
   },
   colorSelectorTitle: {
     fontSize: 16,
     fontWeight: "300",
     color: "#757083",
+    paddingTop: 5,
   },
   colorArray: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginRight: "25%",
-    marginTop: 10
+    paddingTop: 5,
+    paddingBottom: 5,
   },
   colorArrayItem: {
     width: 40,
@@ -171,7 +177,7 @@ const styles = StyleSheet.create({
 
   // ****** Start Chat Button ******
   boxChatButton: {
-    flex: 0.3,
+    height: 60,
     width: "88%",
     backgroundColor: "#757083",
     alignItems: "center",
