@@ -31,7 +31,7 @@ export default class App extends React.Component {
   }
 }
 
-// style sheet at the bottom
+// styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
