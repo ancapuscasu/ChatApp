@@ -1,17 +1,20 @@
-import React, { Component }from "react";
+import React, { Component } from "react";
 
 //importing Gifted Chat (UI for chat) component
-import { GiftedChat, Bubble, Text, InputToolbar } from "react-native-gifted-chat";
+import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from '@react-native-community/netinfo';
 
 //importing UI components from react-native
-import { View, StyleSheet, KeyboardAvoidingView, Platform, Alert,  LogBox } from "react-native";
+import { View, StyleSheet, KeyboardAvoidingView, Platform, LogBox } from "react-native";
+
+import CustomActions from "./CustomActions";
+import MapView from "react-native-maps";
 
 //importing Firestore
-const firebase = require('firebase');
-require('firebase/firestore');
+import * as firebase from 'firebase';
+import "firebase/firestore";
 
 // web app's Firebase configuration
 const firebaseConfig = {
@@ -33,12 +36,14 @@ export default class Chat extends Component {
     this.state = {
       messages: [],
       uid: 0,
-      isConnected: undefined,
       user: {
         _id: "",
         name: "",
         avatar: "",
       },
+      isConnected: false,
+      image: null,
+      location: null,
     }
 
     //initializing Firebase
@@ -53,16 +58,12 @@ export default class Chat extends Component {
     this.referenceUserMessages = null;
 
      // Removes warning message in the iOS Simulator console -- CHECK LATER
-    LogBox.ignoreLogs([
-      'Setting a timer',
-      'AsyncStorage',
-      'undefined',
-      'Animated.event now requires a second argument for options',
-  ]);
+    LogBox.ignoreAllLogs();
   }
 
-
-  // when updated set the messages state with the current data 
+  /**
+   * when updated set the messages state with the current data 
+  */
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
     // go through each document
@@ -79,15 +80,7 @@ export default class Chat extends Component {
           avatar: data.user.avatar,
         },
         image: data.image || null,
-        // You can also add a video prop:
-        video: data.video || null,
-        // Mark the message as sent, using one tick
-        sent: data.sent,
-        // Mark the message as received, using two tick
-        received: data.received,
-        // Mark the message as pending with a clock loader
-        pending: data.pending,
-        // Any additional custom parameters are passed through
+        location: data.location || null
       });
     });
     this.setState({
@@ -98,8 +91,9 @@ export default class Chat extends Component {
 
 
 
-
-  //Add message to messages collection
+  /**
+   * Add message to messages collection
+  */
   addMessages() {
     const message = this.state.messages[0];
     this.referenceChatMessages.add({
@@ -109,7 +103,7 @@ export default class Chat extends Component {
       user: this.state.user,
       image: message.image || "",
       location: message.location || null,
-    })
+    });
   }
 
   //FUNCTION TO DELETE COLLECTION DOCUMENTS - CHECK LATER
@@ -121,8 +115,9 @@ export default class Chat extends Component {
   //   })
   // }
 
-
-  // Function to add messages array to AsyncStorage - stringifies messages object
+  /**
+   * Function to add messages array to AsyncStorage - stringifies messages object
+  */
   async saveMessages() {
     try {
       await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages));
@@ -131,11 +126,13 @@ export default class Chat extends Component {
     }
   }
 
-  // Function to get messages from AsynStorage - sets messages state with parsed item
+  /**
+   * function to get messages from AsynStorage - sets messages state with parsed item
+  */
   async getMessages() {
     let messages = '';
     try {
-      messages = await AsyncStorage.getItem('messages') || [];
+      messages = await AsyncStorage.getItem('messages') || [];//set empty if there is no storage item
       this.setState({
         messages: JSON.parse(messages)
       });
@@ -144,7 +141,10 @@ export default class Chat extends Component {
     }
   };
 
-  //function to remove messages item from AsyncStorage
+
+  /**
+   * function to remove messages item from AsyncStorage
+  */
   async deleteMessages() {
     try {
       await AsyncStorage.removeItem("messages");
@@ -213,18 +213,21 @@ export default class Chat extends Component {
   
   }
 
-  //Stop listening to authentication and collection changes
+  /**
+   * Stop listening to authentication and collection changes
+  */
+ 
   componentWillUnmount() {
-    if (this.state.isConnected === true) {
       this.unsubscribe();
       this.authUnsubscribe();
-    }
   }
 
 
-  
+  /**
+   * function to add message to messages[array]; 
+   * takes array of existing messages and appends current message to it
+  */
 
-  //function to add message to messages[array]; takes array of existing messages and appends current message to it
   onSend(messages = []) {
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
@@ -236,27 +239,25 @@ export default class Chat extends Component {
   }
 
 
-
-  //function to adjust Bubble backgroundColor to color chosen by user
-  renderBubble = (props) => {
+  /**
+   * function to adjust Bubble backgroundColor to color chosen by user
+  */
+   renderBubble(props) {
     return (
       <Bubble
         {...props}
         wrapperStyle={{
           right: {
-            backgroundColor: this.props.route.params.bgColor,
-            padding: 2,
+            backgroundColor: "#FF7777",
           },
-          left: {
-            backgroundColor: "#E2E2E2",
-            padding: 2
-          }
         }}
       />
-    )
+    );
   }
 
-  //function to remove inputbar if user is offline
+  /**
+   * Function to hide inputbar when offline
+  */
   renderInputToolbar(props) {
     if (this.state.isConnected == false) {
     } else {
@@ -264,17 +265,50 @@ export default class Chat extends Component {
         <InputToolbar
         {...props}
         />
-      );
+      )
     }
   }
+
+  /**
+  * Function to display the communication features 
+  * (get image from camera roll, take a photo or send location)
+  */
+  renderCustomActions(props) {
+    return <CustomActions {...props} />;
+  }
   
+  renderCustomView(props) {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          style={{
+            width: 150,
+            height: 100,
+            borderRadius: 13,
+            margin: 3
+          }}
+          region = {{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421
+          }}
+          />
+      )
+    }
+    return null;
+  }
+
   render() {
     return (
-      <View style={styles.chatScreen}>
+      <View style={{ flex: 1, backgroundColor: this.props.route.params.bgColor }}>
         {/* <Text>{this.state.loggedInText}</Text> */}
         <GiftedChat
         renderBubble={this.renderBubble.bind(this)}
         renderInputToolbar={this.renderInputToolbar.bind(this)}
+        renderActions={this.renderCustomActions}
+        renderCustomView={this.renderCustomView}
         messages={this.state.messages}
         onSend={messages => this.onSend(messages)}
         user={{
@@ -289,11 +323,4 @@ export default class Chat extends Component {
   }
 }
 
-
-//styles 
-const styles = StyleSheet.create({
-  chatScreen: {
-    flex: 1,
-  },
-});
 
