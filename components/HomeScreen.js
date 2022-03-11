@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 
 //importing UI components from react-native
-import { StyleSheet, View, Text, ImageBackground, Pressable, TextInput, TouchableOpacity, KeyboardAvoidingView } from "react-native";
+import { StyleSheet, View, Text, ImageBackground, Platform, Pressable, TextInput, TouchableOpacity, KeyboardAvoidingView } from "react-native";
 
 //importing assets
 import BackgroundImage from '../assets/BackgroundImage.png';
 import ProfileIcon from '../assets/ProfileIcon.svg'
+
 
 
 // The application’s Home Screen component that renders the landing page
@@ -37,6 +38,9 @@ const HomeScreen = ({ navigation }) => {
           <View style={styles.boxNameInput}>
             <ProfileIcon height={20} width={20}/>
             <TextInput
+              accessible={true}
+              accessibilityLabel='Your name'
+              accessibilityHint='Type your name to enter the chat room'
               style={styles.nameInput}
               onChangeText={(name) => setName(name)}
               value={name}
@@ -48,18 +52,34 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.colorSelectorTitle}> Choose Background Color: </Text>
             <View style={styles.colorArray}>
                 <TouchableOpacity
+                  accessible={true}
+                  accessibilityLabel='Black background'
+                  accessibilityHint='Adds black background to the chat'
+                  accessibilityRole='button'
                   style={[styles.color1, styles.colorArrayItem]} 
                   onPress={() => changeBgColor(colors.dark)}>
                 </TouchableOpacity>
                 <TouchableOpacity 
+                  accessible={true}
+                  accessibilityLabel='Purple background'
+                  accessibilityHint='Adds purple background to the chat screen'
+                  accessibilityRole='button'
                   style={[styles.color2, styles.colorArrayItem]}
                   onPress={() => changeBgColor(colors.purple)}>
                 </TouchableOpacity>
                 <TouchableOpacity 
+                  accessible={true}
+                  accessibilityLabel='Blue background'
+                  accessibilityHint='Adds blue background to the chat screen'
+                  accessibilityRole='button'
                   style={[styles.color3, styles.colorArrayItem]}
                   onPress={() => changeBgColor(colors.blue)}>
                 </TouchableOpacity>
                 <TouchableOpacity 
+                  accessible={true}
+                  accessibilityLabel='Green background'
+                  accessibilityHint='Adds green background to the chat screen'
+                  accessibilityRole='button'
                   style={[styles.color4, styles.colorArrayItem]}
                   onPress={() => changeBgColor(colors.green)}>
                 </TouchableOpacity>     
@@ -68,12 +88,16 @@ const HomeScreen = ({ navigation }) => {
 
           <View style={styles.boxChatButton}>
             <Pressable
-                onPress={() => navigation.navigate('Chat', { 
-                  name: name,
-                  bgColor: bgColor
-                  })}>
-                  <Text style={styles.chatButtonText}>Start Chatting</Text>
-              </Pressable>
+              accessible={true}
+              accessibilityLabel='Start chatting'
+              accessibilityHint='Lets you enter the chat room'
+              accessibilityRole='button'
+              onPress={() => navigation.navigate('Chat', { 
+                name: name,
+                bgColor: bgColor
+                })}>
+                <Text style={styles.chatButtonText}>Start Chatting</Text>
+            </Pressable>
           </View>
         </View>  
       </ImageBackground>
