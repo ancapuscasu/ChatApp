@@ -71,27 +71,30 @@ export default class CustomActions extends Component {
    * get the location of the user using GPS
    */
    getLocation = async () => {
+    // permission to access user location
     const { status } = await Location.requestForegroundPermissionsAsync();
     console.log(status);
     try {
-        if ( status === 'granted') {
-            let result = await Location.getCurrentPositionAsync({
-            }).catch((error) => {
-                console.log(error)
-            });
-            if (!result) {
-                this.props.onSend({
-                    location: {
-                        longitude: result.coords.longitude,
-                        latitude: result.coords.latitude,
-                    }
-                })
-            }
+      if (status === "granted") {
+        let result = await Location.getCurrentPositionAsync({}).catch(
+          (error) => {
+            console.error(error);
+          }
+        );
+        // Send latitude and longitude to locate the position on the map
+        if (result) {
+          this.props.onSend({
+            location: {
+              longitude: result.coords.longitude,
+              latitude: result.coords.latitude,
+            },
+          });
         }
+      }
     } catch (error) {
-        console.error(error);
+      console.error(error);
     }
-};
+  };
 
   /**
    * Function to store uploaded image to firebase as blobs
