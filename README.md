@@ -14,10 +14,10 @@ A chat app for mobile devices using React Native. The app will provide users wit
 
 ## Tools
 
-React Native
-Expo
-Google Firebase
-Gifted chat
+* React Native
+* Expo
+* Google Firebase
+* Gifted chat
 
 ## Installation
 
