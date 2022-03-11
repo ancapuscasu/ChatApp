@@ -1,4 +1,8 @@
 # ChatApp
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/83923018/157804153-f0b3419f-2b36-40de-8f73-514d03cfe7e2.gif" alt="ChatApp Simulation"/>
+</p>
+
 
 ## Description
 
