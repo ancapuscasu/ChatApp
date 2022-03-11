@@ -20,8 +20,12 @@ Gifted chat
 
 ## Installation
 
-Fork or download this respository. 
-`npm install` or `yarn install` on the terminal to install all dependencies.
+Fork or download this respository.
+
+Run `npm install` or `yarn install` on the terminal to install all dependencies.
+
 Install Expo globally `npm install --global expo-cli`.
+
 To start the app, run `expo start` or `npm start`.
+
 To run the app on a device, install an emulator or expo go on your smartphone
